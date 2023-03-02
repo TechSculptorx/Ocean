@@ -1,0 +1,37 @@
+{
+  "name": "ocean",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "dev": "webpack-dev-server --config webpack.dev.js --open",
+    "build": "webpack --config webpack.prod.js"
+  },
+  "author": "priyanshu",
+  "license": "ISC",
+  "devDependencies": {
+    "css-loader": "^6.7.3",
+    "file-loader": "^6.2.0",
+    "fontfaceobserver": "^2.3.0",
+    "gsap": "^3.11.4",
+    "html-loader": "^4.2.0",
+    "html-webpack-plugin": "^5.5.0",
+    "imagesloaded": "^5.0.0",
+    "lil-gui": "^0.18.0",
+    "mini-css-extract-plugin": "^2.7.2",
+    "node-sass": "^8.0.0",
+    "optimize-css-assets-webpack-plugin": "^4.0.0",
+    "raw-loader": "^4.0.2",
+    "sass-loader": "^13.2.0",
+    "style-loader": "^3.3.1",
+    "three": "^0.150.1",
+    "three.js": "^0.77.1",
+    "webpack": "^5.75.0",
+    "webpack-cli": "^5.0.1",
+    "webpack-dev-server": "^4.11.1",
+    "webpack-merge": "^5.8.0"
+  },
+  "dependencies": {
+    "clean-webpack-plugin": "^4.0.0"
+  }
+}
