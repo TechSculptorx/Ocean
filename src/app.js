@@ -7,6 +7,7 @@ import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 // import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import fragment from "./shader/fragment.glsl";
 import vertex from "./shader/vertex.glsl";
+import noise from "./shader/noise.glsl";
 import * as dat from "lil-gui";
 import gsap from "gsap";
 import ocean from "./img/ocean.jpg";
@@ -93,6 +94,7 @@ export default class Sketch {
       uniforms: {
         tDiffuse: { value: null },
         scrollSpeed: { value: 0 },
+        time: { value: 0 },
       },
       vertexShader: `
       varying vec2 vUv;
@@ -106,14 +108,19 @@ export default class Sketch {
       fragmentShader: `
       uniform sampler2D tDiffuse;
       uniform float scrollSpeed;
+      uniform float time;
+      ${noise}
       varying vec2 vUv;
       void main(){
         vec2 newUV = vUv;
-        float area = smoothstep(0.4, 0., vUv.y);
-        area = pow(area, 4.);
+        float area = smoothstep(1., 0.8, vUv.y)* 2. - 1.;
+        // area = pow(area, 4.);
+        float noise = 0.5 * (cnoise(vec3(vUv * 10., time / 5.)) + 1.);
+        float n = smoothstep(0.5, 0.51, noise + area);
         newUV.x -= (vUv.x - 0.5) * 0.1 * area * scrollSpeed;
         gl_FragColor = texture2D( tDiffuse, newUV);
-        // gl_FragColor = vec4(area, 0., 0., 1.);
+        // gl_FragColor = vec4(n, 0., 0., 1.);
+        gl_FragColor = mix(vec4(1.), texture2D( tDiffuse, newUV), n);
       }
       `,
     };
@@ -267,6 +274,7 @@ export default class Sketch {
     this.currentScroll = this.scroll.scrollToRender;
     this.setPosition();
     this.customPass.uniforms.scrollSpeed.value = this.scroll.speedTarget;
+    this.customPass.uniforms.time.value = this.time;
 
     // this.material.uniforms.time.value = this.time;
 
