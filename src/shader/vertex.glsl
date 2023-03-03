@@ -2,6 +2,8 @@ varying vec2 vUv;
 varying float vNoise;
 
 uniform float time;
+uniform vec2 hover;
+uniform float hoverState;
 
 vec4 permute(vec4 x){return mod(((x*34.0)+1.0)*x, 289.0);}
 vec4 taylorInvSqrt(vec4 r){return 1.79284291400159 - 0.85373472095314 * r;}
@@ -80,12 +82,16 @@ void main() {
   float PI = 3.1514592;
   float noise = cnoise(4.*vec3(position.x, position.y, position.z + time/30.));
     // newPosition.z += 0.1 * sin((newPosition.x + 0.25 + time/ 10.0) * 2.0 * PI);
-//   float dist = distance(uv, vec2(0.5));
+
+  float dist = distance(uv, hover);
+
+  newPosition.z += hoverState * 10. * sin(dist * 10.0 + time);
+
 //   newPosition.z += 0.05 * sin(dist*40.);
 
 //  newPosition += 0.1*normal*noise;
 
   gl_Position = projectionMatrix * modelViewMatrix * vec4( newPosition, 1.0 );
-  vNoise = noise;
+  vNoise = hoverState * sin(dist * 10.0 - time);
   vUv = uv;
 }
