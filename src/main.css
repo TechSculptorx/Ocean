@@ -44,6 +44,7 @@ h2 {
   display: grid;
   grid-template-columns: 1fr 1fr;
   grid-gap: 2em 0;
+  padding-bottom: 4rem;
 }
 
 .item {
