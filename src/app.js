@@ -38,6 +38,8 @@ export default class Sketch {
 
     this.renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
 
+    this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
     this.container.appendChild(this.renderer.domElement);
 
     this.controls = new OrbitControls(this.camera, this.renderer.domElement);
@@ -66,6 +68,7 @@ export default class Sketch {
 
     let allDone = [fontOpen, fontPlayfair, preloadImages];
     this.currentScroll = 0;
+    this.previousScroll = 0;
     this.raycaster = new THREE.Raycaster();
     this.mouse = new THREE.Vector2();
 
@@ -113,14 +116,14 @@ export default class Sketch {
       varying vec2 vUv;
       void main(){
         vec2 newUV = vUv;
-        float area = smoothstep(1., 0.8, vUv.y)* 2. - 1.;
-        // area = pow(area, 4.);
-        float noise = 0.5 * (cnoise(vec3(vUv * 10., time / 5.)) + 1.);
-        float n = smoothstep(0.5, 0.51, noise + area);
+        float area = smoothstep(0.4, 0., vUv.y);
+        area = pow(area, 4.);
+        // float noise = 0.5 * (cnoise(vec3(vUv * 10., time / 5.)) + 1.);
+        // float n = smoothstep(0.5, 0.51, noise + area);
         newUV.x -= (vUv.x - 0.5) * 0.1 * area * scrollSpeed;
         gl_FragColor = texture2D( tDiffuse, newUV);
-        // gl_FragColor = vec4(n, 0., 0., 1.);
-        gl_FragColor = mix(vec4(1.), texture2D( tDiffuse, newUV), n);
+        // gl_FragColor = vec4(area, 0., 0., 1.);
+        // gl_FragColor = mix(vec4(1.), texture2D( tDiffuse, newUV), area);
       }
       `,
     };
@@ -271,17 +274,18 @@ export default class Sketch {
     this.time += 0.05;
 
     this.scroll.render();
+    this.previousScroll = this.currentScroll;
     this.currentScroll = this.scroll.scrollToRender;
-    this.setPosition();
-    this.customPass.uniforms.scrollSpeed.value = this.scroll.speedTarget;
-    this.customPass.uniforms.time.value = this.time;
 
-    // this.material.uniforms.time.value = this.time;
+    if (Math.round(this.currentScroll) !== Math.round(this.previousScroll)) {
+      this.setPosition();
+      this.customPass.uniforms.scrollSpeed.value = this.scroll.speedTarget;
+    }
 
     this.materials.forEach((m) => {
       m.uniforms.time.value = this.time;
     });
-
+    this.customPass.uniforms.time.value = this.time;
     this.composer.render();
     requestAnimationFrame(this.render.bind(this));
     // this.renderer.render(this.scene, this.camera);
